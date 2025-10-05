@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trung Thu Yêu Thương</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Quicksand:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -198,6 +199,142 @@
             box-shadow: 0 6px 20px rgba(255, 82, 82, 0.4);
         }
 
+        /* Gallery */
+        .gallery {
+            margin: 30px 0;
+        }
+
+        .gallery-title {
+            color: #ffeb3b;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            font-family: 'Dancing Script', cursive;
+        }
+
+        .gallery-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 150px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .gallery-item .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-item:hover .overlay {
+            opacity: 1;
+        }
+
+        .gallery-item .overlay i {
+            color: white;
+            font-size: 24px;
+        }
+
+        /* Lightbox */
+        .lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .lightbox.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 80%;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .lightbox-close:hover {
+            transform: rotate(90deg);
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .lightbox-nav button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .lightbox-nav button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
         /* Fireworks */
         .firework {
             position: fixed;
@@ -233,6 +370,10 @@
             
             .card {
                 padding: 30px 20px;
+            }
+
+            .gallery-container {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
@@ -304,6 +445,25 @@
                 <p>Yêu em rất nhiều! 🌕</p>
             </div>
 
+            <!-- Gallery -->
+            <div class="gallery">
+                <h3 class="gallery-title">Chúng ta</h3>
+                <div class="gallery-container">
+                    <div class="gallery-item" onclick="openLightbox(0)">
+                        <img src="./anh1.jpg" alt="Kỷ niệm 1">
+                        <div class="overlay">
+                            <i class="fas fa-search-plus"></i>
+                        </div>
+                    </div>
+                    <div class="gallery-item" onclick="openLightbox(1)">
+                        <img src="./anh2.jpg" alt="Kỷ niệm 2">
+                        <div class="overlay">
+                            <i class="fas fa-search-plus"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <button class="button" onclick="showSurprise()">Nhấn chỗ này đi em yêu</button>
 
             <div class="hidden-message" id="surprise">
@@ -313,7 +473,25 @@
         </div>
     </div>
 
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-close" onclick="closeLightbox()">&times;</div>
+        <div class="lightbox-nav">
+            <button onclick="prevImage()"><i class="fas fa-chevron-left"></i></button>
+            <button onclick="nextImage()"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <img src="" alt="Kỷ niệm" id="lightbox-img">
+    </div>
+
     <script>
+        // Gallery images
+        const galleryImages = [
+            './anh1.jpg',
+            './anh2.jpg',
+        ];
+        
+        let currentImageIndex = 0;
+
         // Create stars
         function createStars() {
             const starsContainer = document.getElementById('stars');
@@ -379,10 +557,42 @@
             }
         }
 
+        // Lightbox functions
+        function openLightbox(index) {
+            currentImageIndex = index;
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            
+            lightboxImg.src = galleryImages[index];
+            lightbox.classList.add('active');
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('active');
+        }
+
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+            document.getElementById('lightbox-img').src = galleryImages[currentImageIndex];
+        }
+
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
+            document.getElementById('lightbox-img').src = galleryImages[currentImageIndex];
+        }
+
         // Click anywhere to create firework
         document.addEventListener('click', (e) => {
-            if (e.target.tagName !== 'BUTTON') {
+            if (e.target.tagName !== 'BUTTON' && !e.target.closest('.gallery-item') && !e.target.closest('.lightbox')) {
                 createFirework(e.clientX, e.clientY);
+            }
+        });
+
+        // Close lightbox when clicking outside the image
+        document.getElementById('lightbox').addEventListener('click', (e) => {
+            if (e.target.id === 'lightbox') {
+                closeLightbox();
             }
         });
 
